@@ -6,10 +6,14 @@
     path: "{{ bin_dir }}/etcdctl"
   register: etcdctl_stat
 
-- name: Install etcdadm
-  command: go get -u github.com/coreos/etcd/etcdctl
-  environment:
-    GOBIN: "{{ bin_dir }}"
+- name: Fetch etcdctl
+  unarchive:
+    src: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+    dest: "{{ bin_dir }}"
+    extra_opts:
+      - "--strip-components=1"
+      - "etcd-v{{ etcd_version}}-linux-amd64/etcdctl"
+    remote_src: yes
   when: not etcdctl_stat.stat.exists
 
 - name: Get control plane nodes from etcd
